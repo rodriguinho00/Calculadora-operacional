@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trabalho Final — Gestão Financeira</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+
+<!-- ░░ SIDEBAR NAV ░░ -->
+<aside class="sidebar">
+  <div class="logo">
+    <span class="logo-num">TF</span>
+    <div>
+      <strong>Trabalho</strong>
+      <span>Final</span>
+    </div>
+  </div>
+
+  <nav class="sidenav">
+    <button class="snav active" data-sec="ciclo">
+      <span class="snav-icon">◈</span>
+      <span class="snav-text">
+        <em>01</em>
+        Ciclo Operacional
+      </span>
+    </button>
+    <button class="snav" data-sec="marginal">
+      <span class="snav-icon">◉</span>
+      <span class="snav-text">
+        <em>02</em>
+        Análise Marginal
+      </span>
+    </button>
+    <button class="snav" data-sec="margem">
+      <span class="snav-icon">◍</span>
+      <span class="snav-text">
+        <em>03</em>
+        Margem Contribuição
+      </span>
+    </button>
+    <button class="snav" data-sec="equilibrio">
+      <span class="snav-icon">◎</span>
+      <span class="snav-text">
+        <em>04</em>
+        Ponto de Equilíbrio
+      </span>
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <p>Gestão Financeira</p>
+    <p>Flask · HTML · JS</p>
+  </div>
+</aside>
+
+<!-- ░░ MAIN CONTENT ░░ -->
+<main class="main">
+
+  <!-- ── 01 CICLO OPERACIONAL ──────────────────────────── -->
+  <section id="ciclo" class="section active">
+    <header class="sec-header">
+      <div class="sec-num">01</div>
+      <div>
+        <h1>Ciclo Operacional &amp; <br>Conversão de Caixa</h1>
+        <p class="sec-sub">Mede o tempo que o dinheiro fica "preso" no processo produtivo e o capital necessário para financiá-lo.</p>
+      </div>
+    </header>
+
+    <div class="form-card">
+      <p class="form-title">Prazos Médios</p>
+      <div class="fgrid">
+        <label>PMRE (dias)<span class="hint">Prazo Médio de Renovação de Estoques</span>
+          <input type="number" id="pmre" placeholder="ex: 30" min="0"/></label>
+        <label>PMRV (dias)<span class="hint">Prazo Médio de Recebimento de Vendas</span>
+          <input type="number" id="pmrv" placeholder="ex: 45" min="0"/></label>
+        <label>PMPC (dias)<span class="hint">Prazo Médio de Pagamento a Fornecedores</span>
+          <input type="number" id="pmpc" placeholder="ex: 20" min="0"/></label>
+      </div>
+      <p class="form-title" style="margin-top:20px">Valores Financeiros <span class="opt">opcional — para cálculo do NCG</span></p>
+      <div class="fgrid">
+        <label>Vendas Anuais (R$)<span class="hint">Receita bruta total no ano</span>
+          <input type="number" id="vendas_anuais" placeholder="ex: 500000" min="0"/></label>
+        <label>Estoque Médio (R$)<span class="hint">Saldo médio de estoques no período</span>
+          <input type="number" id="estoque_medio" placeholder="ex: 80000" min="0"/></label>
+        <label>CMV (R$)<span class="hint">Custo das Mercadorias Vendidas no ano</span>
+          <input type="number" id="cmv" placeholder="ex: 300000" min="0"/></label>
+      </div>
+      <button class="btn-calc" onclick="calcCiclo()">▶ Calcular Ciclos</button>
+    </div>
+
+    <div id="result-ciclo" class="result-wrap hidden"></div>
+
+    <!-- LEGENDA -->
+    <div class="legend-panel">
+      <h3 class="legend-title">📖 Legenda — Conceitos e Fórmulas</h3>
+      <div class="legend-grid">
+        <div class="legend-item">
+          <strong>CO — Ciclo Operacional</strong>
+          <code>CO = PMRE + PMRV</code>
+          <p>Período total desde a compra da matéria-prima até o recebimento da venda. Quanto menor, mais eficiente a gestão.</p>
+        </div>
+        <div class="legend-item">
+          <strong>CCC — Ciclo de Conversão de Caixa</strong>
+          <code>CCC = CO − PMPC</code>
+          <p>Dias que a empresa precisa financiar com capital próprio. CCC negativo = fornecedores financiam as operações.</p>
+        </div>
+        <div class="legend-item">
+          <strong>NCG — Necessidade de Capital de Giro</strong>
+          <code>NCG = (Vendas / 365) × CCC</code>
+          <p>Valor em R$ que a empresa precisa ter disponível para manter o ciclo funcionando sem interrupções.</p>
+        </div>
+        <div class="legend-item">
+          <strong>Giro de Estoque</strong>
+          <code>Giro = CMV / Estoque Médio</code>
+          <p>Quantas vezes o estoque se renova no período. Giro alto = boa gestão. Giro baixo = capital parado.</p>
+        </div>
+        <div class="legend-item">
+          <strong>PMRE</strong>
+          <code>PMRE = (Est. Médio / CMV) × 365</code>
+          <p>Quantos dias, em média, os produtos ficam em estoque antes de serem vendidos.</p>
+        </div>
+        <div class="legend-item">
+          <strong>PMRV</strong>
+          <code>PMRV = (CR / Vendas) × 365</code>
+          <p>Quantos dias a empresa demora para receber das vendas a prazo. Impacta diretamente o fluxo de caixa.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 02 ANÁLISE MARGINAL ───────────────────────────── -->
+  <section id="marginal" class="section">
+    <header class="sec-header">
+      <div class="sec-num">02</div>
+      <div>
+        <h1>Análise Marginal</h1>
+        <p class="sec-sub">Calcula A.L. (Alavancagem), C.I.M.D.R (decomposição de resultado) e C.P.M (custo por margem).</p>
+      </div>
+    </header>
+
+    <div class="form-card">
+      <div class="fgrid">
+        <label>Receita Total (R$)<span class="hint">Total das vendas no período</span>
+          <input type="number" id="m_receita" placeholder="ex: 200000" min="0"/></label>
+        <label>Custo Variável Total (R$)<span class="hint">CV proporcional à produção/venda</span>
+          <input type="number" id="m_cv" placeholder="ex: 120000" min="0"/></label>
+        <label>Custo Fixo Total (R$)<span class="hint">Custos que não variam com volume</span>
+          <input type="number" id="m_cf" placeholder="ex: 40000" min="0"/></label>
+        <label>Quantidade Vendida (un.)<span class="hint">Total de unidades vendidas</span>
+          <input type="number" id="m_qtd" placeholder="ex: 1000" min="1"/></label>
+        <label>Depreciação (R$)<span class="hint">Está inclusa no Custo Fixo acima</span>
+          <input type="number" id="m_dep" placeholder="ex: 5000" min="0"/></label>
+        <label>Impostos sobre Receita (%)<span class="hint">Alíquota total (ex: PIS+COFINS+ISS)</span>
+          <input type="number" id="m_imp" placeholder="ex: 9.25" min="0" max="100" step="0.01"/></label>
+      </div>
+      <button class="btn-calc" onclick="calcMarginal()">▶ Calcular Análise</button>
+    </div>
+
+    <div id="result-marginal" class="result-wrap hidden"></div>
+
+    <div class="legend-panel">
+      <h3 class="legend-title">📖 Legenda — Conceitos e Fórmulas</h3>
+      <div class="legend-grid">
+        <div class="legend-item">
+          <strong>A.L. — Alavancagem Operacional</strong>
+          <code>A.L. = MC Total / Lucro Operacional</code>
+          <p>Indica quantas vezes a variação na receita se amplifica no lucro. A.L. = 2 significa que +10% nas vendas gera +20% no lucro.</p>
+        </div>
+        <div class="legend-item">
+          <strong>C.I.M.D.R — Decomposição do Resultado</strong>
+          <code>Resultado = R − CV − CF − Imp − Dep</code>
+          <p><b>C</b>ustos + <b>I</b>mpostos + <b>M</b>argem + <b>D</b>epreciação + <b>R</b>esultado. Visualiza como cada componente consome a receita.</p>
+        </div>
+        <div class="legend-item">
+          <strong>C.P.M — Custo por Margem</strong>
+          <code>CPM = Custo Fixo / MC Unitária</code>
+          <p>Equivalente ao Ponto de Equilíbrio em quantidade. É o número mínimo de unidades a vender para cobrir todos os custos fixos.</p>
+        </div>
+        <div class="legend-item">
+          <strong>MC — Margem de Contribuição</strong>
+          <code>MC = Receita − Custos Variáveis</code>
+          <p>Quanto cada unidade vendida "contribui" para cobrir os custos fixos e gerar lucro.</p>
+        </div>
+        <div class="legend-item">
+          <strong>Índice de MC (%)</strong>
+          <code>IMC = MC Total / Receita × 100</code>
+          <p>Percentual da receita que sobra após pagar todos os custos variáveis. Quanto maior, mais eficiente.</p>
+        </div>
+        <div class="legend-item">
+          <strong>Margem Operacional</strong>
+          <code>MO = Lucro Op. / Receita × 100</code>
+          <p>Percentual que a empresa retém como lucro antes de impostos sobre o resultado e despesas financeiras.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 03 MARGEM DE CONTRIBUIÇÃO ────────────────────── -->
+  <section id="margem" class="section">
+    <header class="sec-header">
+      <div class="sec-num">03</div>
+      <div>
+        <h1>Margem de Contribuição</h1>
+        <p class="sec-sub">Calcula a contribuição unitária e total, índice percentual, margem de segurança e lucratividade.</p>
+      </div>
+    </header>
+
+    <div class="form-card">
+      <div class="fgrid">
+        <label>Preço de Venda Unit. (R$)<span class="hint">Valor cobrado por unidade</span>
+          <input type="number" id="mc_preco" placeholder="ex: 50.00" min="0" step="0.01"/></label>
+        <label>Custo Variável Unit. (R$)<span class="hint">CV por unidade (matéria-prima, comissão…)</span>
+          <input type="number" id="mc_cv" placeholder="ex: 28.00" min="0" step="0.01"/></label>
+        <label>Impostos Unit. (R$)<span class="hint">Tributos por unidade vendida</span>
+          <input type="number" id="mc_imp" placeholder="ex: 5.00" min="0" step="0.01"/></label>
+        <label>Custo Fixo Total (R$)<span class="hint">Total de custos fixos do período</span>
+          <input type="number" id="mc_cf" placeholder="ex: 40000" min="0"/></label>
+        <label>Quantidade Vendida (un.)<span class="hint">Volume real de vendas no período</span>
+          <input type="number" id="mc_qtd" placeholder="ex: 800" min="0"/></label>
+      </div>
+      <button class="btn-calc" onclick="calcMargem()">▶ Calcular Margem</button>
+    </div>
+
+    <div id="result-margem" class="result-wrap hidden"></div>
+
+    <div class="legend-panel">
+      <h3 class="legend-title">📖 Legenda — Conceitos e Fórmulas</h3>
+      <div class="legend-grid">
+        <div class="legend-item">
+          <strong>MC Unitária</strong>
+          <code>MC Unit = Preço − CV Unit − Imp Unit</code>
+          <p>Quanto sobra por unidade para cobrir os custos fixos. Se negativa, cada venda causa prejuízo.</p>
+        </div>
+        <div class="legend-item">
+          <strong>MC Total</strong>
+          <code>MC Total = MC Unit × Quantidade</code>
+          <p>Valor total disponível para absorver os custos fixos no período. MC Total > Custo Fixo = Lucro.</p>
+        </div>
+        <div class="legend-item">
+          <strong>Índice de MC (%)</strong>
+          <code>IMC = MC Unit / Preço × 100</code>
+          <p>Percentual do preço que representa contribuição. Útil para comparar produtos com preços diferentes.</p>
+        </div>
+        <div class="legend-item">
+          <strong>Margem de Segurança (Qtd)</strong>
+          <code>MS = Qtd Vendida − PE Quantidade</code>
+          <p>Quantas unidades a empresa pode deixar de vender sem entrar em prejuízo. Quanto maior, menor o risco.</p>
+        </div>
+        <div class="legend-item">
+          <strong>Margem de Segurança (%)</strong>
+          <code>MS% = MS Qtd / Qtd Vendida × 100</code>
+          <p>Percentual de queda nas vendas suportável antes do prejuízo. Empresas saudáveis têm MS% &gt; 20%.</p>
+        </div>
+        <div class="legend-item">
+          <strong>Ponto de Equilíbrio (PE)</strong>
+          <code>PE Qtd = CF Total / MC Unitária</code>
+          <p>Quantidade mínima para cobrir todos os custos sem lucro nem prejuízo. Referência central da gestão.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 04 PONTO DE EQUILÍBRIO ────────────────────────── -->
+  <section id="equilibrio" class="section">
+    <header class="sec-header">
+      <div class="sec-num">04</div>
+      <div>
+        <h1>Ponto de Equilíbrio</h1>
+        <p class="sec-sub">Calcula o PE Contábil, Financeiro e Econômico em quantidade e em valor monetário.</p>
+      </div>
+    </header>
+
+    <div class="form-card">
+      <div class="fgrid">
+        <label>Custo Fixo Total (R$)<span class="hint">Todos os custos que não variam</span>
+          <input type="number" id="pe_cf" placeholder="ex: 40000" min="0"/></label>
+        <label>Margem de Contribuição Unit. (R$)<span class="hint">Preço − CV Unit (já calculada)</span>
+          <input type="number" id="pe_mc" placeholder="ex: 20.00" min="0" step="0.01"/></label>
+        <label>Preço de Venda Unit. (R$)<span class="hint">Para converter PE Qtd em R$</span>
+          <input type="number" id="pe_preco" placeholder="ex: 50.00" min="0" step="0.01"/></label>
+        <label>Depreciação (R$)<span class="hint">Parcela do CF sem saída de caixa</span>
+          <input type="number" id="pe_dep" placeholder="ex: 5000" min="0"/></label>
+        <label>Lucro Mínimo Desejado (R$)<span class="hint">Meta de lucro — PE Econômico</span>
+          <input type="number" id="pe_lucro" placeholder="ex: 15000" min="0"/></label>
+      </div>
+      <button class="btn-calc" onclick="calcEquilibrio()">▶ Calcular PE</button>
+    </div>
+
+    <div id="result-equilibrio" class="result-wrap hidden"></div>
+
+    <div class="legend-panel">
+      <h3 class="legend-title">📖 Legenda — Os 3 Pontos de Equilíbrio</h3>
+      <div class="legend-grid">
+        <div class="legend-item accent-blue">
+          <strong>PE Contábil (PEC)</strong>
+          <code>PEC Qtd = CF / MC Unit</code>
+          <p>Quantidade onde Receita = Custos Totais. O lucro contábil é zero. Ponto base para análise.</p>
+        </div>
+        <div class="legend-item accent-green">
+          <strong>PE Financeiro (PEF)</strong>
+          <code>PEF Qtd = (CF − Depreciação) / MC Unit</code>
+          <p>Remove a depreciação (não é saída de caixa). Indica o volume mínimo para não ter déficit de caixa.</p>
+        </div>
+        <div class="legend-item accent-orange">
+          <strong>PE Econômico (PEE)</strong>
+          <code>PEE Qtd = (CF + Lucro Desejado) / MC Unit</code>
+          <p>Inclui um lucro mínimo esperado pelo investidor. É o volume necessário para valer a pena operar.</p>
+        </div>
+        <div class="legend-item">
+          <strong>PE em Valor (R$)</strong>
+          <code>PE Valor = PE Qtd × Preço de Venda</code>
+          <p>Converte o PE de unidades para faturamento. Útil quando não se vende um produto único.</p>
+        </div>
+        <div class="legend-item">
+          <strong>Interpretação Prática</strong>
+          <code>PEF &lt; PEC &lt; PEE</code>
+          <p>Sempre nessa ordem. A empresa é saudável quando vende acima do PEE com uma boa margem de segurança.</p>
+        </div>
+        <div class="legend-item">
+          <strong>Depreciação no PE</strong>
+          <code>CF Financeiro = CF − Depreciação</code>
+          <p>A depreciação reduz o lucro contábil, mas não sai do caixa. Por isso o PEF é sempre menor que o PEC.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="/static/js/main.js"></script>
+</body>
+</html>
